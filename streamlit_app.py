@@ -5,11 +5,9 @@ import joblib
 MODEL_FILE = "model.pkl"
 PIPELINE_FILE = "pipeline.pkl"
 
-USD_TO_INR = 83  # approximate conversion rate, update if needed
-
 st.set_page_config(page_title="Housing Price Predictor", page_icon="🏠", layout="centered")
 
-st.title("🏠 California Housing Price Predictor")
+st.title("🏠 Housing Price Predictor")
 st.write("This app predicts the median house value in California based on various features. Adjust the sliders and select options to see the predicted price.")
 @st.cache_resource
 def load_model_and_pipeline():
@@ -41,14 +39,14 @@ if model_loaded:
         st.subheader("🏘️ Property Details")
         col3, col4 = st.columns(2)
         with col3:
-            housing_median_age = st.slider("Housing Median Age (years)", min_value=1, max_value=52, value=41)
-            total_rooms = st.slider("Total Rooms", min_value=1, max_value=10000, value=880, step=10)
-            total_bedrooms = st.slider("Total Bedrooms", min_value=1, max_value=2000, value=129, step=5)
+            housing_median_age = st.number_input("Housing Median Age (years)", min_value=1, max_value=52, value=41)
+            total_rooms = st.number_input("Total Rooms", min_value=1, max_value=10000, value=880, step=10)
+            total_bedrooms = st.number_input("Total Bedrooms", min_value=1, max_value=2000, value=129, step=5)
 
         with col4:
-            population = st.slider("Population", min_value=1, max_value=10000, value=322, step=10)
-            households = st.slider("Households", min_value=1, max_value=2000, value=126, step=5)
-            median_income = st.slider("Median Income (in $10,000s)", min_value=0.5, max_value=15.0, value=8.3252, step=0.01)
+            population = st.number_input("Population", min_value=1, max_value=10000, value=322, step=10)
+            households = st.number_input("Households", min_value=1, max_value=2000, value=126, step=5)
+            median_income = st.number_input("Median Income (in $10,000s)", min_value=0.5, max_value=15.0, value=8.3252, step=0.01)
 
         submitted = st.form_submit_button("Predict Price 🔮")
 
@@ -67,7 +65,9 @@ if model_loaded:
 
         transformed = pipeline.transform(input_df)
         prediction_usd = model.predict(transformed)[0]
-        prediction_inr = prediction_usd * USD_TO_INR
-
-        st.success(f"### Predicted House Value: ₹{prediction_inr:,.0f}")
-        st.caption(f"(Approx. conversion from ${prediction_usd:,.2f} USD at ₹{USD_TO_INR}/USD)")
+        st.subheader("🔮 Predicted Median House Value")
+        st.write(f"${prediction_usd:,.2f}")
+        st.write("Note: The predicted value is in USD and represents the median house value for the given features.")
+        st.caption(f"Disclaimer: This prediction is based on a machine learning model and may not reflect actual market conditions. Use it for informational purposes only."
+                   f" The model was trained on historical data and may not account for recent market changes or unique property characteristics."
+                   f"Estimated median house valuebased on the selected features.")
